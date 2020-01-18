@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_item_popular"
+        android:title="Popular"
+        android:icon="@drawable/ic_popular"
+        />
+
+    <item
+        android:id="@+id/menu_item_latest"
+        android:icon="@drawable/ic_latest"
+        android:title="Latest" />
+
+    <item
+        android:id="@+id/menu_item_shows_to_follow"
+        android:icon="@drawable/ic_favorite"
+        android:title="My TV shows" />
+</menu>
