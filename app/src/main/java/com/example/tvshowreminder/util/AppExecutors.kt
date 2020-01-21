@@ -4,16 +4,15 @@ import android.os.Looper
 import java.util.concurrent.Executor
 import java.util.concurrent.Executors
 import java.util.concurrent.ScheduledExecutorService
+import javax.inject.Inject
+import javax.inject.Singleton
 
 
-const val THREAD_COUNT = 3
-
-class AppExecutors {
+@Singleton
+class AppExecutors @Inject constructor() {
 
     val diskIO = DiskIOThreadExecutor()
-    val networkIO: ScheduledExecutorService = Executors.newScheduledThreadPool(THREAD_COUNT)
     val main = MainThreadExecutor()
-
 
     class DiskIOThreadExecutor : Executor {
         private val diskIO = Executors.newSingleThreadExecutor()

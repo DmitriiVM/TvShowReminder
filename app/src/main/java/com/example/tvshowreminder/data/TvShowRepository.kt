@@ -8,12 +8,14 @@ import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import com.example.tvshowreminder.util.ERROR_MESSAGE_NETWORK_PROBLEM_1
 import com.example.tvshowreminder.util.ERROR_MESSAGE_NETWORK_PROBLEM_2
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class TvShowRepository private constructor(
+@Singleton
+class TvShowRepository @Inject constructor(
     private val network: NetworkContract,
     private val database: DatabaseContract
 ) {
-
 
     private var _cachedTvShowList = mutableListOf<TvShow>()
     val cachedTvShowList: List<TvShow>

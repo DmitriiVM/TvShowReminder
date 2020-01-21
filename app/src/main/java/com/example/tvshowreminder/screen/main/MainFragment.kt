@@ -1,8 +1,8 @@
 package com.example.tvshowreminder.screen.main
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -10,7 +10,7 @@ import com.example.tvshowreminder.R
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.database.DatabaseDataSource
 import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkDaraSource
+import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.screen.detail.DetailActivity
 import com.example.tvshowreminder.util.*
@@ -21,16 +21,19 @@ import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.example.tvshowreminder.TvShowApplication
 import com.example.tvshowreminder.screen.settings.SettingsActivity
 import kotlinx.android.synthetic.main.dialog_layout.view.*
+import javax.inject.Inject
 
 class MainFragment : Fragment(), MainScreenContract.View,
     TvShowRecyclerAdapter.OnTvShowClickListener,
     BottomNavigationView.OnNavigationItemSelectedListener {
 
+    @Inject
+    lateinit var presenter: MainScreenContract.Presenter
 
     private lateinit var adapter: TvShowRecyclerAdapter
-    private lateinit var presenter: MainScreenContract.Presenter
     private lateinit var searchView: SearchView
     private var menuItemId = R.id.menu_item_popular
     private var toast: Toast? = null
@@ -39,6 +42,10 @@ class MainFragment : Fragment(), MainScreenContract.View,
     private var page = 1
     private var afterSearch = false
 
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as TvShowApplication).appComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -54,14 +61,8 @@ class MainFragment : Fragment(), MainScreenContract.View,
         (requireActivity() as MainActivity).setSupportActionBar(toolbar)
         setHasOptionsMenu(true)
 
-        val tvShowRepository = TvShowRepository.getInstance(
-            database = DatabaseDataSource(
-                TvShowDatabase.getInstance(requireContext()),
-                AppExecutors()
-            ),
-            network = NetworkDaraSource
-        )
-        presenter = MainPresenter(tvShowRepository, this)
+        presenter.attachView(this)
+
         setRecyclerView()
         bottom_nav_view.setOnNavigationItemSelectedListener(this)
 

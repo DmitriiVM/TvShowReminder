@@ -8,12 +8,15 @@ import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import com.example.tvshowreminder.util.AppExecutors
 import com.example.tvshowreminder.util.MESSAGE_EMPTY_DATABASE
 import com.example.tvshowreminder.util.MESSAGE_NO_SEARCH_MATCHES
+import javax.inject.Inject
+import javax.inject.Singleton
 
-class DatabaseDataSource(
+
+@Singleton
+class DatabaseDataSource @Inject constructor(
     private val tvShowDatabase: TvShowDatabase,
     private val appExecutors: AppExecutors
 ) : DatabaseContract {
-
 
     override fun getPopularTvShowList(
         successCallback: (List<TvShow>) -> Unit,
@@ -110,12 +113,7 @@ class DatabaseDataSource(
         appExecutors.diskIO.execute {
             tvShowDatabase.tvShowDao().getFavouriteTvShow(tvShowId).let { tvShow ->
                 appExecutors.main.execute {
-                    if (tvShow == null) {
-                        errorCallback(MESSAGE_EMPTY_DATABASE)
-                    } else {
                         successCallback(tvShow)
-                    }
-
                 }
             }
         }

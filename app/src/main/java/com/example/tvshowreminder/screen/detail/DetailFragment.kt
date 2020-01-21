@@ -1,31 +1,37 @@
 package com.example.tvshowreminder.screen.detail
 
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
 import androidx.fragment.app.Fragment
-import com.bumptech.glide.Glide
-import com.bumptech.glide.request.RequestOptions
 import com.example.tvshowreminder.R
+import com.example.tvshowreminder.TvShowApplication
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.database.DatabaseDataSource
 import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkDaraSource
+import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import com.example.tvshowreminder.screen.detail.tabsfragments.adapters.TabFragmentPageAdapter
 import com.example.tvshowreminder.util.*
 //import com.example.tvshowreminder.util.setImage
 import kotlinx.android.synthetic.main.fragment_detail.*
+import javax.inject.Inject
 
 const val TV_SHOW_ID = "tv_show_id"
 
 class DetailFragment : Fragment(), DetailContract.View {
 
-    private lateinit var presenter: DetailPresenter
+    @Inject
+    lateinit var presenter: DetailContract.Presenter
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as TvShowApplication).appComponent.inject(this)
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -34,20 +40,12 @@ class DetailFragment : Fragment(), DetailContract.View {
         return inflater.inflate(R.layout.fragment_detail, container, false)
     }
 
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val tvShowId = arguments?.getInt(TV_SHOW_ID)
 
-        presenter = DetailPresenter(
-            TvShowRepository.getInstance(
-                NetworkDaraSource,
-                DatabaseDataSource.getInstance(
-                    TvShowDatabase.getInstance(requireContext()),
-                    AppExecutors()
-                )
-            ), this
-        )
+        presenter.attachView(this)
+
         progress_bar.visibility = View.VISIBLE
         button_add_delete.isEnabled = false
 

@@ -1,8 +1,8 @@
 package com.example.tvshowreminder.screen.detail.tabsfragments
 
 
+import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -12,13 +12,15 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 
 import com.example.tvshowreminder.R
+import com.example.tvshowreminder.TvShowApplication
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.database.DatabaseDataSource
 import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkDaraSource
+import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.screen.detail.tabsfragments.adapters.SeasonsRecyclerViewAdapter
 import com.example.tvshowreminder.util.AppExecutors
+import javax.inject.Inject
 
 const val KEY_TV_ID = "tv_id"
 const val KEY_NUMBER_OF_SEASONS = "number_of_seasons"
@@ -26,9 +28,18 @@ const val KEY_NUMBER_OF_SEASONS = "number_of_seasons"
 
 class SeasonsFragment : Fragment(), SeasonsContract.View {
 
+    @Inject
+    lateinit var presenter: SeasonsContract.Presenter
+
     private var tvId: Int? = null
     private var numberOfSeasons: Int? = null
     private lateinit var adapter: SeasonsRecyclerViewAdapter
+
+
+    override fun onAttach(context: Context) {
+        super.onAttach(context)
+        (requireActivity().application as TvShowApplication).appComponent.inject(this)
+    }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -48,13 +59,7 @@ class SeasonsFragment : Fragment(), SeasonsContract.View {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        val presenter = SeasonFragmentPresenter(
-            repository = TvShowRepository.getInstance(
-                network = NetworkDaraSource,
-                database = DatabaseDataSource(TvShowDatabase.getInstance(requireContext()), AppExecutors())
-            ),
-            view = this
-        )
+        presenter.attachView(this)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_seasons)
         recyclerView.layoutManager = LinearLayoutManager(requireContext())

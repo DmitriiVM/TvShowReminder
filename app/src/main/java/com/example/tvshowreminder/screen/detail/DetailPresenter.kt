@@ -3,11 +3,17 @@ package com.example.tvshowreminder.screen.detail
 import android.util.Log
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import javax.inject.Inject
 
-class DetailPresenter(
-    private val repository: TvShowRepository,
-    private val view: DetailContract.View
+class DetailPresenter @Inject constructor(
+    private val repository: TvShowRepository
 ) : DetailContract.Presenter {
+
+    lateinit var view: DetailContract.View
+
+    override fun attachView(view: DetailContract.View) {
+        this.view = view
+    }
 
     private var tvShowDetails: TvShowDetails? = null
 
@@ -25,7 +31,6 @@ class DetailPresenter(
                 view.setButtonWithDeleteFunction()
             }
         }
-
     }
 
     override fun deleteTvShowFromDatabase() {

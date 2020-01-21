@@ -10,9 +10,7 @@ import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-object NetworkDaraSource: NetworkContract {
-
-
+object NetworkDataSource: NetworkContract {
 
     override fun getPopularTvShowList(
         language: String,

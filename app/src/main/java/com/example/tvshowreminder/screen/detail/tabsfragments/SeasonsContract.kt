@@ -11,5 +11,7 @@ interface SeasonsContract {
 
     interface Presenter{
         fun getSeasonsDetails(tvId: Int, seasonNumber: Int, numberOfSeasons: Int)
+
+        fun attachView(view: SeasonsContract.View)
     }
 }

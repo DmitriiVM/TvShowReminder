@@ -16,5 +16,7 @@ interface MainScreenContract {
         fun searchTvShow(selectedItemId: Int, query: String, page: String )
         fun getCachedTvShowList(): List<TvShow>
         fun getCachedFavouriteTvShowList(): List<TvShow>
+
+        fun attachView(view: View)
     }
 }

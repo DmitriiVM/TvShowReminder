@@ -15,5 +15,7 @@ interface DetailContract {
         fun getTvShowDetail(tvShowId: Int)
         fun insertTvShowToDatabase()
         fun deleteTvShowFromDatabase()
+
+        fun attachView(view: DetailContract.View)
     }
 }

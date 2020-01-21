@@ -8,12 +8,18 @@ import com.example.tvshowreminder.util.MESSAGE_NO_SEARCH_MATCHES
 import com.example.tvshowreminder.util.MESSAGE_NO_TVSHOWS_IN_LIST
 import com.example.tvshowreminder.util.getCurrentDate
 import com.example.tvshowreminder.util.getDeviceLanguage
+import javax.inject.Inject
 
-class MainPresenter(
-    private val repository: TvShowRepository,
-    private val view: MainScreenContract.View
+class MainPresenter @Inject constructor(
+    private val repository: TvShowRepository
 ) : MainScreenContract.Presenter {
 
+
+    lateinit var view: MainScreenContract.View
+
+    override fun attachView(view: MainScreenContract.View){
+        this.view = view
+    }
 
     private val language = getDeviceLanguage()
     private val currentDate = getCurrentDate()

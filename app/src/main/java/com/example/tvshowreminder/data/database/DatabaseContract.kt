@@ -3,6 +3,7 @@ package com.example.tvshowreminder.data.database
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import javax.inject.Inject
 
 interface DatabaseContract {
 

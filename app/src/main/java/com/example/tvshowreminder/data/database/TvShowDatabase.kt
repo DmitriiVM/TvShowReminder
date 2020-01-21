@@ -17,20 +17,4 @@ import com.example.tvshowreminder.util.DB_NAME
 abstract class TvShowDatabase : RoomDatabase() {
 
     abstract fun tvShowDao():TvShowDao
-
-    companion object {
-
-        @Volatile
-        private var instance: TvShowDatabase? = null
-
-        fun getInstance(context: Context): TvShowDatabase = instance ?: synchronized(this) {
-            instance ?: buildDatabase(context).also { instance = it }
-        }
-
-        private fun buildDatabase(context: Context): TvShowDatabase =
-            Room.databaseBuilder(context.applicationContext, TvShowDatabase::class.java, DB_NAME).fallbackToDestructiveMigration().build()
-
-    }
-
-
 }
