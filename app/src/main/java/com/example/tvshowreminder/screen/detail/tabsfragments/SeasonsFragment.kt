@@ -3,6 +3,7 @@ package com.example.tvshowreminder.screen.detail.tabsfragments
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,13 +14,8 @@ import androidx.recyclerview.widget.RecyclerView
 
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.TvShowApplication
-import com.example.tvshowreminder.data.TvShowRepository
-import com.example.tvshowreminder.data.database.DatabaseDataSource
-import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.screen.detail.tabsfragments.adapters.SeasonsRecyclerViewAdapter
-import com.example.tvshowreminder.util.AppExecutors
 import javax.inject.Inject
 
 const val KEY_TV_ID = "tv_id"
@@ -58,7 +54,6 @@ class SeasonsFragment : Fragment(), SeasonsContract.View {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-
         presenter.attachView(this)
 
         val recyclerView = view.findViewById<RecyclerView>(R.id.recycler_view_seasons)
@@ -85,5 +80,15 @@ class SeasonsFragment : Fragment(), SeasonsContract.View {
 
     override fun showError(message: String) {
         Toast.makeText(requireContext(), message, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        presenter.onPause()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 }

@@ -9,13 +9,14 @@ interface DetailContract {
         fun showError(errorMessage: String)
         fun setButtonWitAddFunction()
         fun setButtonWithDeleteFunction()
+        fun showProgressBar(isVisible: Boolean)
     }
 
     interface Presenter{
         fun getTvShowDetail(tvShowId: Int)
         fun insertTvShowToDatabase()
         fun deleteTvShowFromDatabase()
-
-        fun attachView(view: DetailContract.View)
+        fun attachView(view: View)
+        fun onDestroy()
     }
 }

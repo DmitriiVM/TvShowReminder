@@ -3,113 +3,97 @@ package com.example.tvshowreminder.screen.main
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.pojo.general.TvShow
-import com.example.tvshowreminder.data.pojo.general.TvShowDetails
-import com.example.tvshowreminder.util.MESSAGE_NO_SEARCH_MATCHES
-import com.example.tvshowreminder.util.MESSAGE_NO_TVSHOWS_IN_LIST
-import com.example.tvshowreminder.util.getCurrentDate
-import com.example.tvshowreminder.util.getDeviceLanguage
+import com.example.tvshowreminder.util.*
+import io.reactivex.Flowable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class MainPresenter @Inject constructor(
     private val repository: TvShowRepository
 ) : MainScreenContract.Presenter {
 
-
     lateinit var view: MainScreenContract.View
+    private var disposable: CompositeDisposable = CompositeDisposable()
 
     override fun attachView(view: MainScreenContract.View){
         this.view = view
     }
-
     private val language = getDeviceLanguage()
     private val currentDate = getCurrentDate()
 
     override fun getTvShowList(itemId: Int, page: String) {
         when (itemId) {
             R.id.menu_item_popular -> {
-                getPopularTvShowList(page)
+                getTvShows(repository.getPopularTvShowList(language = language, page = page))
             }
             R.id.menu_item_latest -> {
-                getLatestTvShowList(currentDate, language, page)
+                getTvShows(repository.getLatestTvShowList(currentDate = currentDate, language = language, page = page))
             }
             R.id.menu_item_shows_to_follow -> {
-                getFavouriteTvShowList()
+                getTvShows(repository.getFavouriteTvShowList())
             }
         }
     }
 
-    override fun getPopularTvShowList(page: String) {
-        repository.getPopularTvShowList(language = language, page = page,
-            successCallback = { tvShowList ->
-                view.displayTvShowList(tvShowList)
-            }, errorCallback = { errorMessage ->
-                view.showMessage(errorMessage)
-            })
-    }
-
-    private fun getLatestTvShowList(currentDate: String, language: String, page: String) {
-        repository.getLatestTvShowList(currentDate = currentDate, language = language, page = page,
-            successCallback = { tvShowList ->
-                view.displayTvShowList(tvShowList)
-            }, errorCallback = { errorMessage ->
-                view.showMessage(errorMessage)
-            })
-    }
-
-    private fun getFavouriteTvShowList() {
-        repository.getFavouriteTvShowList({ tvShowDetailListFromDb ->
-            if (tvShowDetailListFromDb.isNullOrEmpty()) {
-                view.resetAdapterList()
-                view.showMessage(MESSAGE_NO_TVSHOWS_IN_LIST)
-            } else {
-                val tvShowList = mutableListOf<TvShow>()
-                for (i in tvShowDetailListFromDb.indices) {
-                    repository.getTvShowDetails(tvShowDetailListFromDb[i].id, { tvShoeDetail ->
-                        tvShowList.add(
-                            TvShow(
-                                id = tvShoeDetail.id,
-                                name = tvShoeDetail.name,
-                                originalName = tvShoeDetail.originalName,
-                                posterPath = tvShoeDetail.posterPath,
-                                voteAverage = tvShoeDetail.voteAverage
-                            )
-                        )
-                        if (tvShowList.size == tvShowDetailListFromDb.size) {
-                            view.displayTvShowList(tvShowList)
+    private fun getTvShows(resource: Flowable<Resource<List<TvShow>>>) = disposable.add(
+        resource
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ res ->
+                view.apply {
+                    showProgressBar(false)
+                    when (res) {
+                        is Resource.Loading -> showProgressBar(true)
+                        is Resource.EmptyList -> {
+                            resetAdapterList()
+                            showMessage(MESSAGE_NO_TVSHOWS_IN_LIST)
                         }
-                    }, {})
-                }
-            }
-        }, { errorMessage ->
-            view.showMessage(errorMessage)
-        })
-    }
-
-
-    override fun searchTvShow(selectedItemId: Int, query: String, page: String) {
-        when (selectedItemId) {
-            R.id.menu_item_popular, R.id.menu_item_latest  -> {
-                repository.searchTvShowsList(query = query, language = language, page = page, successCallback = { tvShowList ->
-                    if (tvShowList.isEmpty()){
-                        view.showMessage(MESSAGE_NO_SEARCH_MATCHES)
-                    } else {
-                        view.resetAdapterList()
-                        view.displayTvShowList(tvShowList)
+                        is Resource.Error -> showMessage(res.message)
+                        is Resource.Success -> displayTvShowList(res.data)
+                        is Resource.SuccessWithMessage -> {
+                            showMessage(res.networkErrorMessage)
+                            displayTvShowList(res.data)
+                            disposable.clear()
+                        }
                     }
-                }, errorCallback = { errorMessage ->
-                    view.showMessage(errorMessage)
-                })
-            }
-            R.id.menu_item_shows_to_follow -> {
-                repository.searchTvShowsListInFavourite(query, { tvShowList ->
-                    view.resetAdapterList()
-                    view.displayTvShowList(tvShowList)
-                }, { errorMessage ->
-                    view.showMessage(errorMessage)
-                })
-            }
+                }
+            }, { t ->
+                view.showMessage(t.message ?: ERROR_MESSAGE)
+            })
+    )
+
+
+    override fun searchTvShow(selectedItemId: Int, query: String) {
+        when (selectedItemId) {
+            R.id.menu_item_popular, R.id.menu_item_latest  ->
+                search(repository.searchTvShowsList(query, language))
+            R.id.menu_item_shows_to_follow -> search(repository.searchTvShowsListInFavourite(query))
         }
     }
+
+    private fun search(resource: Flowable<Resource<List<TvShow>>>) = disposable.add(
+        resource
+            .subscribeOn(Schedulers.io())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ res ->
+                view.apply {
+                    showProgressBar(false)
+                    when (res) {
+                        is Resource.Loading -> showProgressBar(true)
+                        is Resource.EmptyList -> showMessage(MESSAGE_NO_SEARCH_MATCHES)
+                        is Resource.Error -> showMessage(res.message)
+                        is Resource.Success -> {
+                            resetAdapterList()
+                            displayTvShowList(res.data)
+                        }
+                    }
+                }
+            }, { t ->
+                view.showMessage(t.message ?: ERROR_MESSAGE)
+            })
+    )
 
     override fun getCachedTvShowList() = repository.cachedTvShowList
 
@@ -121,4 +105,6 @@ class MainPresenter @Inject constructor(
         }
         return tvShowList
     }
+
+    override fun onDestroy() = disposable.dispose()
 }

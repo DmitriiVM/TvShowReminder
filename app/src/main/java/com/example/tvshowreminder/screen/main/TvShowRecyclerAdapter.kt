@@ -15,15 +15,16 @@ import kotlinx.android.synthetic.main.tvshow_item_poster_type.view.*
 
 class TvShowRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
+    interface OnTvShowClickListener {
+        fun onTvShowClick(tvId: Int)
+    }
+
     private var onTvShowClickListener: OnTvShowClickListener? = null
     private var tvShowList: MutableList<TvShow> = arrayListOf()
 
-    fun getList() = tvShowList
-
     fun addItems(newTvShowList: List<TvShow>) {
-        val lastPosition  = tvShowList.size
         this.tvShowList.addAll(newTvShowList)
-        notifyItemRangeInserted(lastPosition, tvShowList.size)
+        notifyDataSetChanged()
     }
 
     fun resetList() {
@@ -31,15 +32,13 @@ class TvShowRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
         notifyDataSetChanged()
     }
 
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
-        return TvShowViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tvshow_item_compact_type, parent, false))
-    }
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
+        TvShowViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tvshow_item_compact_type, parent, false))
 
     override fun getItemCount(): Int = tvShowList.size
 
-    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+    override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) =
         (holder as TvShowViewHolder).onBind(tvShowList[position])
-    }
 
     inner class TvShowViewHolder(private val view: View) : RecyclerView.ViewHolder(view) {
 
@@ -49,15 +48,11 @@ class TvShowRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
                 text_view_title.text = tvShow.name
                 text_view_raiting.text = tvShow.voteAverage.toString()
                 text_view_popularuty.text = tvShow.popularity?.toInt().toString()
-            }
-            view.setOnClickListener {
-                onTvShowClickListener?.onTvShowClick(tvShow.id)
+                setOnClickListener {
+                    onTvShowClickListener?.onTvShowClick(tvShow.id)
+                }
             }
         }
-    }
-
-    interface OnTvShowClickListener {
-        fun onTvShowClick(tvId: Int)
     }
 
     fun setOnShowClickListener(onTvShowClickListener: OnTvShowClickListener) {

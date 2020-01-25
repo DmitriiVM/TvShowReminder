@@ -3,6 +3,7 @@ package com.example.tvshowreminder.screen.detail
 
 import android.content.Context
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -10,14 +11,9 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.TvShowApplication
-import com.example.tvshowreminder.data.TvShowRepository
-import com.example.tvshowreminder.data.database.DatabaseDataSource
-import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import com.example.tvshowreminder.screen.detail.tabsfragments.adapters.TabFragmentPageAdapter
 import com.example.tvshowreminder.util.*
-//import com.example.tvshowreminder.util.setImage
 import kotlinx.android.synthetic.main.fragment_detail.*
 import javax.inject.Inject
 
@@ -46,7 +42,6 @@ class DetailFragment : Fragment(), DetailContract.View {
 
         presenter.attachView(this)
 
-        progress_bar.visibility = View.VISIBLE
         button_add_delete.isEnabled = false
 
         tvShowId?.let {
@@ -74,6 +69,14 @@ class DetailFragment : Fragment(), DetailContract.View {
         }
     }
 
+    override fun showProgressBar(isVisible: Boolean){
+        if (isVisible) {
+            progress_bar.visibility = View.VISIBLE
+        } else {
+            progress_bar.visibility = View.INVISIBLE
+        }
+    }
+
     override fun displayTvShow(tvShowDetails: TvShowDetails) {
         progress_bar.visibility = View.INVISIBLE
         text_view_title.text = tvShowDetails.name
@@ -89,8 +92,12 @@ class DetailFragment : Fragment(), DetailContract.View {
     }
 
     override fun showError(errorMessage: String) {
-        progress_bar.visibility = View.INVISIBLE
         Toast.makeText(requireContext(), errorMessage, Toast.LENGTH_SHORT).show()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 
     companion object {

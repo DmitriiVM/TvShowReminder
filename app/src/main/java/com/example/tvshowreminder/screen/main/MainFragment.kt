@@ -3,14 +3,11 @@ package com.example.tvshowreminder.screen.main
 import android.content.Context
 import android.content.Intent
 import android.os.Bundle
+import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import com.example.tvshowreminder.R
-import com.example.tvshowreminder.data.TvShowRepository
-import com.example.tvshowreminder.data.database.DatabaseDataSource
-import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.screen.detail.DetailActivity
 import com.example.tvshowreminder.util.*
@@ -37,10 +34,10 @@ class MainFragment : Fragment(), MainScreenContract.View,
     private lateinit var searchView: SearchView
     private var menuItemId = R.id.menu_item_popular
     private var toast: Toast? = null
-    private var isLoading = false
     private var query : String? = null
     private var page = 1
     private var afterSearch = false
+    private var isNeededToLoad = true
 
     override fun onAttach(context: Context) {
         super.onAttach(context)
@@ -69,7 +66,6 @@ class MainFragment : Fragment(), MainScreenContract.View,
         if (savedInstanceState != null) {
             handleConfigurationChange(savedInstanceState)
         } else {
-            progressBar.visibility = View.VISIBLE
             presenter.getTvShowList(menuItemId, page.toString())
         }
     }
@@ -104,17 +100,18 @@ class MainFragment : Fragment(), MainScreenContract.View,
                     return
                 }
                 if (!recyclerView.canScrollVertically(1)
-                    && !isLoading && ConnectivityHelper.isOnline(requireContext())
+                     && ConnectivityHelper.isOnline(requireContext())
                 ) {
-                    progressBar.visibility = View.VISIBLE
-                    isLoading = true
-                    page++
-                    presenter.getTvShowList(menuItemId, page.toString())
+                    if (isNeededToLoad) {
+                        page++
+                        presenter.getTvShowList(menuItemId, page.toString())
+                    }else {
+                        isNeededToLoad = true
+                    }
                 }
             }
         })
     }
-
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
         super.onCreateOptionsMenu(menu, inflater)
@@ -168,8 +165,6 @@ class MainFragment : Fragment(), MainScreenContract.View,
 
     override fun displayTvShowList(tvShowList: List<TvShow>) {
         adapter.addItems(tvShowList)
-        isLoading = false
-        progressBar.visibility = View.INVISIBLE
     }
 
     override fun resetAdapterList(){
@@ -178,21 +173,18 @@ class MainFragment : Fragment(), MainScreenContract.View,
 
     private fun search(query: String) {
         if (ConnectivityHelper.isOnline(requireContext()) || menuItemId == R.id.menu_item_shows_to_follow) {
-            progressBar.visibility = View.VISIBLE
-            isLoading = true
             afterSearch = true
             val selectedItemId =
                 bottom_nav_view.menu.findItem(bottom_nav_view.selectedItemId).itemId
-            presenter.searchTvShow(selectedItemId, query, page.toString())
+            presenter.searchTvShow(selectedItemId, query)
         } else
             showResultMessage(MESSAGE_SEARCH_NO_INTERNET)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         if (menuItemId != item.itemId || afterSearch){
-            progressBar.visibility = View.VISIBLE
-            isLoading = true
             page = 1
+            isNeededToLoad = false
             adapter.resetList()
             menuItemId = item.itemId
             presenter.getTvShowList(menuItemId, page.toString())
@@ -224,11 +216,18 @@ class MainFragment : Fragment(), MainScreenContract.View,
                 presenter.getTvShowList(menuItemId, page.toString())
             }
         }
+        page = 1
+    }
+
+    override fun showProgressBar(isVisible: Boolean){
+        if (isVisible) {
+            progressBar.visibility = View.VISIBLE
+        } else {
+            progressBar.visibility = View.INVISIBLE
+        }
     }
 
     override fun showMessage(message: String) {
-        isLoading = false
-        progressBar.visibility = View.INVISIBLE
         showResultMessage(message)
     }
 
@@ -250,6 +249,11 @@ class MainFragment : Fragment(), MainScreenContract.View,
 
     companion object {
         fun newInstance() = MainFragment()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
+        presenter.onDestroy()
     }
 
 }

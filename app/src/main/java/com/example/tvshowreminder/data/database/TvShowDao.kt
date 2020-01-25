@@ -8,56 +8,60 @@ import com.example.tvshowreminder.data.pojo.general.LatestTvShow
 import com.example.tvshowreminder.data.pojo.general.PopularTvShow
 import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import io.reactivex.Completable
+import io.reactivex.Flowable
+import io.reactivex.Single
 
 
 @Dao
 interface TvShowDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = PopularTvShow::class)
-    fun insertPopularTvShowList(tvShowList: List<TvShow>) : List<Long>
+    fun insertPopularTvShowList(tvShowList: List<TvShow>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = LatestTvShow::class)
-    fun insertLatestTvShowList(tvShowList: List<TvShow>) : List<Long>
+    fun insertLatestTvShowList(tvShowList: List<TvShow>)
 
     @Query("SELECT * FROM popular_tv_shows_table")
-    fun getPopularTvShowsList(): List<TvShow>
+    fun getPopularTvShowsList(): Flowable<List<TvShow>>
 
     @Query("SELECT * FROM latest_tv_shows_table")
-    fun getLatestTvShowsList(): List<TvShow>
+    fun getLatestTvShowsList(): Flowable<List<TvShow>>
 
     @Query("SELECT * FROM tv_show_details")
-    fun getFavouriteTvShowsList(): List<TvShowDetails>
+    fun getFavouriteTvShowsList(): Flowable<List<TvShowDetails>>
+
 
     @Query("SELECT * FROM tv_show_details WHERE original_name LIKE '%' || :query || '%' OR name LIKE '%' || :query || '%'")
-    fun searchTvShowsList(query: String): List<TvShow>
+    fun searchTvShowsList(query: String): Flowable<List<TvShow>>
 
 
     @Query("SELECT * FROM tv_show_details WHERE id = :tvShowId")
-    fun getFavouriteTvShow(tvShowId: Int): TvShowDetails
+    fun getFavouriteTvShow(tvShowId: Int): Flowable<TvShowDetails>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertTvShow(tvShowDetails: TvShowDetails) : Long
+    fun insertTvShow(tvShowDetails: TvShowDetails) : Completable
 
     @Delete
-    fun deleteTvShow(tvShowDetails: TvShowDetails) : Int
+    fun deleteTvShow(tvShowDetails: TvShowDetails) : Completable
 
 
     @Query("SELECT * FROM seasons_details WHERE show_id = :tvShowId AND season_number = :seasonNumber")
-    fun getFavouriteSeasonDetails(tvShowId: Int, seasonNumber: Int): SeasonDetails
+    fun getFavouriteSeasonDetails(tvShowId: Int, seasonNumber: Int): Flowable<SeasonDetails>
 
     @Query("SELECT * FROM episode WHERE show_id = :tvShowId AND season_number = :seasonNumber")
-    fun getEpisodesGorSeason(tvShowId: Int, seasonNumber: Int) : List<Episode>
+    fun getEpisodesForSeason(tvShowId: Int, seasonNumber: Int) : Flowable<List<Episode>>
 
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertFavouriteSeasonDetails(seasonDetails: SeasonDetails): Long
+    fun insertFavouriteSeasonDetails(seasonDetails: SeasonDetails)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    fun insertEpisodes(episodes: List<Episode>): List<Long>
+    fun insertEpisodes(episodes: List<Episode>)
 
 
     @Query("DELETE FROM seasons_details WHERE id = :tvShowId")
-    fun deleteFavouriteSeasonDetail(tvShowId: Int): Int
+    fun deleteFavouriteSeasonDetail(tvShowId: Int)
 
 
 

@@ -2,7 +2,14 @@ package com.example.tvshowreminder.screen.detail
 
 import android.util.Log
 import com.example.tvshowreminder.data.TvShowRepository
+import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import com.example.tvshowreminder.util.ERROR_MESSAGE
+import com.example.tvshowreminder.util.Resource
+import io.reactivex.Completable
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
+import io.reactivex.schedulers.Schedulers
 import javax.inject.Inject
 
 class DetailPresenter @Inject constructor(
@@ -10,53 +17,90 @@ class DetailPresenter @Inject constructor(
 ) : DetailContract.Presenter {
 
     lateinit var view: DetailContract.View
+    private var disposable: CompositeDisposable = CompositeDisposable()
+
+    private var tvShowDetails: TvShowDetails? = null
 
     override fun attachView(view: DetailContract.View) {
         this.view = view
     }
 
-    private var tvShowDetails: TvShowDetails? = null
-
     override fun getTvShowDetail(tvShowId: Int) {
-        checkForPresenceInList(tvShowId)
-        repository.getTvShowDetails(tvShowId, { tvShowDetails ->
-            view.displayTvShow(tvShowDetails)
-            this.tvShowDetails = tvShowDetails
-        }, {})
+        disposable.add(
+            repository.getTvShowDetails(tvShowId)
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({resource ->
+                    view.apply {
+                        showProgressBar(false)
+                        when (resource) {
+                            is Resource.Loading -> showProgressBar(true)
+                            is Resource.Error -> showError(resource.message)
+                            is Resource.Success -> {
+                                view.displayTvShow(resource.data)
+                                tvShowDetails = resource.data
+                                setButton(tvShowId)
+
+                            }
+                        }
+                    }
+                }, { t ->
+                    view.showProgressBar(false)
+                    view.showError(t.message ?: ERROR_MESSAGE)
+                })
+        )
     }
 
     override fun insertTvShowToDatabase() {
         tvShowDetails?.let {
-            repository.insertTvShow(it){
-                view.setButtonWithDeleteFunction()
-            }
+            addOrDeleteTvShow(repository.insertTvShow(it))
         }
     }
 
     override fun deleteTvShowFromDatabase() {
         tvShowDetails?.let {
-            repository.deleteTvShow(it){
-                view.setButtonWitAddFunction()
-            }
+            addOrDeleteTvShow(repository.deleteTvShow(it))
         }
     }
 
-    private fun checkForPresenceInList(tvShowId: Int) {
-        repository.getFavouriteTvShowList({ favouriteTvShowList ->
+    private fun addOrDeleteTvShow(completable: Completable) {
+        disposable.add(
+            completable
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .subscribe({
+                    view.showProgressBar(false)
+                }, {})
+        )
+    }
 
-            var isPresent = false
-            favouriteTvShowList.forEach { tvShow ->
-                if (tvShow.id == tvShowId) {
-                    isPresent = true
+    private fun setButton(tvShowId: Int) {
+        disposable.add(
+            repository.getFavouriteTvShowList()
+                .subscribeOn(Schedulers.io())
+                .observeOn(AndroidSchedulers.mainThread())
+                .doOnError {
+                    view.setButtonWitAddFunction()
                 }
-            }
-            if (isPresent) {
+                .subscribe {
+                    when (it) {
+                        is Resource.Success -> checkAndSetButton(it.data, tvShowId)
+                    }
+                }
+        )
+    }
+
+    private fun checkAndSetButton(list: List<TvShow>, tvShowId: Int) {
+        list.forEach { tvShow ->
+            if (tvShow.id == tvShowId) {
                 view.setButtonWithDeleteFunction()
-            } else {
-                view.setButtonWitAddFunction()
+                return
             }
-        }, {
-            view.setButtonWitAddFunction()
-        })
+        }
+        view.setButtonWitAddFunction()
+    }
+
+    override fun onDestroy(){
+        disposable.dispose()
     }
 }

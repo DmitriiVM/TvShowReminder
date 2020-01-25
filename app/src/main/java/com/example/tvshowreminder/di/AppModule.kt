@@ -5,15 +5,10 @@ import androidx.room.Room
 import com.example.tvshowreminder.data.database.DatabaseContract
 import com.example.tvshowreminder.data.database.DatabaseDataSource
 import com.example.tvshowreminder.data.database.TvShowDatabase
-import com.example.tvshowreminder.data.network.NetworkContract
-import com.example.tvshowreminder.data.network.NetworkDataSource
 import com.example.tvshowreminder.screen.detail.DetailContract
-import com.example.tvshowreminder.screen.detail.DetailFragment
 import com.example.tvshowreminder.screen.detail.DetailPresenter
-import com.example.tvshowreminder.screen.detail.tabsfragments.SeasonFragmentPresenter
+import com.example.tvshowreminder.screen.detail.tabsfragments.SeasonPresenter
 import com.example.tvshowreminder.screen.detail.tabsfragments.SeasonsContract
-import com.example.tvshowreminder.screen.detail.tabsfragments.SeasonsFragment
-import com.example.tvshowreminder.screen.main.MainFragment
 import com.example.tvshowreminder.screen.main.MainPresenter
 import com.example.tvshowreminder.screen.main.MainScreenContract
 import com.example.tvshowreminder.util.DB_NAME
@@ -34,10 +29,6 @@ abstract class AppModule {
         fun provideTvShowDatabase(context: Context): TvShowDatabase =
             Room.databaseBuilder(context, TvShowDatabase::class.java, DB_NAME)
                 .fallbackToDestructiveMigration().build()
-
-        @Provides
-        @JvmStatic
-        fun provideNetworkDataSource(): NetworkDataSource = NetworkDataSource
     }
 
     @Binds
@@ -47,11 +38,8 @@ abstract class AppModule {
     abstract fun bindDetailPresenter(presenter: DetailPresenter): DetailContract.Presenter
 
     @Binds
-    abstract fun bindSeasonPresenter(presenter: SeasonFragmentPresenter): SeasonsContract.Presenter
+    abstract fun bindSeasonPresenter(presenter: SeasonPresenter): SeasonsContract.Presenter
 
     @Binds
     abstract fun bindDatabaseContract(databaseContract: DatabaseDataSource): DatabaseContract
-
-    @Binds
-    abstract fun bindNetworkContract(networkContract: NetworkDataSource): NetworkContract
 }

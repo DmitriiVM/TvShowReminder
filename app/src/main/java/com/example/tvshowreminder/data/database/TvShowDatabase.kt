@@ -13,7 +13,7 @@ import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import com.example.tvshowreminder.util.DB_NAME
 
 
-@Database(entities = [TvShow::class, LatestTvShow::class, PopularTvShow::class,  TvShowDetails::class, SeasonDetails::class, Episode::class], version = 26)
+@Database(entities = [TvShow::class, LatestTvShow::class, PopularTvShow::class,  TvShowDetails::class, SeasonDetails::class, Episode::class], version = 1)
 abstract class TvShowDatabase : RoomDatabase() {
 
     abstract fun tvShowDao():TvShowDao

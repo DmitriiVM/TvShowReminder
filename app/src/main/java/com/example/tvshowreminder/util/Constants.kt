@@ -14,6 +14,7 @@ const val KEY_PAGE = "page"
 
 
 
+const val ERROR_MESSAGE= "Ошибка"
 const val ERROR_MESSAGE_NETWORK_PROBLEM_1 = "Проблема с получением данных через интернет. Показан список, сохраненный в предыдущем сеансе"
 const val ERROR_MESSAGE_NETWORK_PROBLEM_2 = "Проблема с получением данных через интернет"
 const val MESSAGE_EMPTY_DATABASE = "Нет данных в базе"
