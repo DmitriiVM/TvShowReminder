@@ -3,9 +3,11 @@ package com.example.tvshowreminder.data.network
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.data.pojo.general.TvShowsList
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import com.example.tvshowreminder.util.LANGUAGE_RUS
+import com.example.tvshowreminder.util.SORT_BY_DATE_DESC
+import com.example.tvshowreminder.util.SORT_BY_POPULARITY_DESC
 import io.reactivex.Flowable
 import io.reactivex.Single
-import retrofit2.Call
 import retrofit2.http.*
 
 
@@ -16,7 +18,7 @@ interface MovieDbApi {
         @Query("sort_by") sortBy: String = SORT_BY_POPULARITY_DESC,
         @Query("language") language: String = LANGUAGE_RUS,
         @Query("page") page: String
-    ): Flowable<TvShowsList>
+    ): Single<TvShowsList>
 
     @GET("discover/tv")
     fun getLatestTvShowList(
@@ -24,7 +26,7 @@ interface MovieDbApi {
         @Query("first_air_date.lte") currentDate: String,
         @Query("language") language: String = LANGUAGE_RUS,
         @Query("page") page: String
-    ): Flowable<TvShowsList>
+    ): Single<TvShowsList>
 
     @GET("search/tv")
     fun searchTvShow(

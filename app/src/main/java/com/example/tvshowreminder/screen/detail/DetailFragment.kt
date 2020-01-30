@@ -3,7 +3,6 @@ package com.example.tvshowreminder.screen.detail
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -16,8 +15,6 @@ import com.example.tvshowreminder.screen.detail.tabsfragments.adapters.TabFragme
 import com.example.tvshowreminder.util.*
 import kotlinx.android.synthetic.main.fragment_detail.*
 import javax.inject.Inject
-
-const val TV_SHOW_ID = "tv_show_id"
 
 class DetailFragment : Fragment(), DetailContract.View {
 
@@ -54,7 +51,7 @@ class DetailFragment : Fragment(), DetailContract.View {
             text = BUTTON_ADD
             isEnabled = true
             setOnClickListener {
-                presenter.insertTvShowToDatabase()
+                presenter.insertTvShowToDatabase(requireContext().applicationContext)
             }
         }
     }
@@ -64,7 +61,7 @@ class DetailFragment : Fragment(), DetailContract.View {
             text = BUTTON_DELETE
             isEnabled = true
             setOnClickListener {
-                presenter.deleteTvShowFromDatabase()
+                presenter.deleteTvShowFromDatabase(requireContext().applicationContext)
             }
         }
     }

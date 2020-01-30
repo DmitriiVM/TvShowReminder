@@ -15,9 +15,8 @@
             android:id="@+id/toolbar"
             android:layout_width="match_parent"
             android:layout_height="?attr/actionBarSize"
-            android:background="@color/colorGreyToolbarAndBottomNav"
+            android:background="@color/colorGrey"
             android:theme="@style/ThemeOverlay.MaterialComponents.Dark.ActionBar"
-            app:titleTextAppearance="@style/TextAppearance.AppCompat.Small"
             app:layout_scrollFlags="scroll|enterAlways"/>
     </com.google.android.material.appbar.AppBarLayout>
 
@@ -35,7 +34,7 @@
         android:id="@+id/bottom_nav_view"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorGreyToolbarAndBottomNav"
+        android:background="@color/colorGrey"
         android:layout_gravity="bottom"
         app:itemIconTint="@drawable/bottom_navigation_colors"
         app:itemTextColor="@drawable/bottom_navigation_colors"

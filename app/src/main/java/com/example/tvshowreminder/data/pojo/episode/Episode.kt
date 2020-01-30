@@ -24,7 +24,12 @@ data class Episode(
     @SerializedName("production_code")
     @ColumnInfo(name = "production_code")
     val productionCode: String?,
-    @ForeignKey(entity = SeasonDetails::class, parentColumns = ["seasonNumber"], childColumns = ["seasonNumber"], onDelete = CASCADE)
+    @ForeignKey(
+        entity = SeasonDetails::class,
+        parentColumns = ["seasonNumber"],
+        childColumns = ["seasonNumber"],
+        onDelete = CASCADE
+    )
     @SerializedName("season_number")
     @ColumnInfo(name = "season_number")
     val seasonNumber: Int?,

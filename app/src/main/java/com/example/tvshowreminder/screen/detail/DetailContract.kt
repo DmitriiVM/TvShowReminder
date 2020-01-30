@@ -1,5 +1,7 @@
 package com.example.tvshowreminder.screen.detail
 
+import android.content.Context
+import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 
 interface DetailContract {
@@ -14,8 +16,8 @@ interface DetailContract {
 
     interface Presenter{
         fun getTvShowDetail(tvShowId: Int)
-        fun insertTvShowToDatabase()
-        fun deleteTvShowFromDatabase()
+        fun insertTvShowToDatabase(appContext: Context)
+        fun deleteTvShowFromDatabase(appContext: Context)
         fun attachView(view: View)
         fun onDestroy()
     }

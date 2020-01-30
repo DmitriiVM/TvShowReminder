@@ -1,11 +1,16 @@
 package com.example.tvshowreminder.screen.detail
 
+import android.content.Context
 import android.util.Log
+import com.example.tvshowreminder.R
+import com.example.tvshowreminder.backgroundwork.cancelAlarm
+import com.example.tvshowreminder.backgroundwork.setAlarm
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import com.example.tvshowreminder.util.ERROR_MESSAGE
 import com.example.tvshowreminder.util.Resource
+import com.example.tvshowreminder.util.getDeviceLanguage
 import io.reactivex.Completable
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
@@ -27,7 +32,7 @@ class DetailPresenter @Inject constructor(
 
     override fun getTvShowDetail(tvShowId: Int) {
         disposable.add(
-            repository.getTvShowDetails(tvShowId)
+            repository.getTvShowDetails(tvShowId, getDeviceLanguage())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({resource ->
@@ -51,27 +56,34 @@ class DetailPresenter @Inject constructor(
         )
     }
 
-    override fun insertTvShowToDatabase() {
-        tvShowDetails?.let {
-            addOrDeleteTvShow(repository.insertTvShow(it))
+    override fun insertTvShowToDatabase(appContext: Context) {
+        tvShowDetails?.let { tvShow ->
+            disposable.add(
+                repository.insertTvShow(tvShow)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        view.showProgressBar(false)
+                        setButton(tvShow.id)
+                        appContext.setAlarm(tvShow)
+                    }, {  })
+            )
         }
     }
 
-    override fun deleteTvShowFromDatabase() {
-        tvShowDetails?.let {
-            addOrDeleteTvShow(repository.deleteTvShow(it))
+    override fun deleteTvShowFromDatabase(appContext: Context) {
+        tvShowDetails?.let { tvShow ->
+            disposable.add(
+                repository.deleteTvShow(tvShow)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribe({
+                        view.showProgressBar(false)
+                        setButton(tvShow.id)
+                        appContext.cancelAlarm(tvShow.id)
+                    }, {})
+            )
         }
-    }
-
-    private fun addOrDeleteTvShow(completable: Completable) {
-        disposable.add(
-            completable
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribe({
-                    view.showProgressBar(false)
-                }, {})
-        )
     }
 
     private fun setButton(tvShowId: Int) {
@@ -82,11 +94,13 @@ class DetailPresenter @Inject constructor(
                 .doOnError {
                     view.setButtonWitAddFunction()
                 }
-                .subscribe {
+                .subscribe({
                     when (it) {
                         is Resource.Success -> checkAndSetButton(it.data, tvShowId)
                     }
-                }
+                },{
+                    view.setButtonWitAddFunction()
+                })
         )
     }
 

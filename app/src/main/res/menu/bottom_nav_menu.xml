@@ -3,17 +3,17 @@
 
     <item
         android:id="@+id/menu_item_popular"
-        android:title="Popular"
+        android:title="@string/bottom_menu_popular"
         android:icon="@drawable/ic_popular"
         />
 
     <item
         android:id="@+id/menu_item_latest"
         android:icon="@drawable/ic_latest"
-        android:title="Latest" />
+        android:title="@string/bottom_menu_latest" />
 
     <item
         android:id="@+id/menu_item_shows_to_follow"
         android:icon="@drawable/ic_favorite"
-        android:title="My TV shows" />
+        android:title="@string/bottom_menu_my_list" />
 </menu>

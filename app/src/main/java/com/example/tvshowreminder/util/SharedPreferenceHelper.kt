@@ -23,6 +23,4 @@ class SharedPreferenceHelper {
     }
 
     fun getSignalInfo() =  prefs?.getBoolean("signal_in_notification", false)
-
-
 }

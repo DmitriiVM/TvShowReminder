@@ -7,7 +7,7 @@ import androidx.room.PrimaryKey
 import com.google.gson.annotations.SerializedName
 
 @Entity(tableName = "tv_shows")
-class TvShow(
+data class TvShow(
     @PrimaryKey
     var id: Int,
     @SerializedName("backdrop_path")
@@ -15,7 +15,7 @@ class TvShow(
     val backdropPath: String? = null,
     @SerializedName("first_air_date")
     @ColumnInfo(name = "first_air_date")
-    val firstAirDate: String? = null,
+    var firstAirDate: String? = null,
     var name: String? = null,
     @SerializedName("original_name")
     @ColumnInfo(name = "original_name")

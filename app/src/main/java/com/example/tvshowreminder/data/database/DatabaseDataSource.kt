@@ -1,13 +1,13 @@
 package com.example.tvshowreminder.data.database
 
-
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.data.pojo.general.TvShow
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import io.reactivex.Completable
 import io.reactivex.Flowable
+import io.reactivex.Single
 import javax.inject.Inject
 import javax.inject.Singleton
-
 
 @Singleton
 class DatabaseDataSource @Inject constructor(
@@ -17,10 +17,10 @@ class DatabaseDataSource @Inject constructor(
     override fun getPopularTvShowList()
             = tvShowDatabase.tvShowDao().getPopularTvShowsList()
 
-    override fun getLatestTvShowList(): Flowable<List<TvShow>>
+    override fun getLatestTvShowList()
             = tvShowDatabase.tvShowDao().getLatestTvShowsList()
 
-    override fun getFavouriteTvShowList(): Flowable<List<TvShowDetails>>
+    override fun getFavouriteTvShowList()
             = tvShowDatabase.tvShowDao().getFavouriteTvShowsList()
 
     override fun getFavouriteSeasonDetails(

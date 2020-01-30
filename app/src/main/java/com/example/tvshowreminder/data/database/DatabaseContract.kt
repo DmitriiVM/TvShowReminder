@@ -6,13 +6,12 @@ import com.example.tvshowreminder.data.pojo.general.TvShowDetails
 import io.reactivex.Completable
 import io.reactivex.Flowable
 import io.reactivex.Single
-import javax.inject.Inject
 
 interface DatabaseContract {
 
-    fun getPopularTvShowList(): Flowable<List<TvShow>>
-    fun getLatestTvShowList(): Flowable<List<TvShow>>
-    fun getFavouriteTvShowList(): Flowable<List<TvShowDetails>>
+    fun getPopularTvShowList(): Single<List<TvShow>>
+    fun getLatestTvShowList(): Single<List<TvShow>>
+    fun getFavouriteTvShowList(): Single<List<TvShowDetails>>
 
     fun insertPopularTvShowList(tvShowList: List<TvShow>)
     fun insertLatestTvShowList(tvShowList: List<TvShow>)
@@ -26,5 +25,4 @@ interface DatabaseContract {
     fun deleteFavouriteSeasonDetails(tvShowId: Int)
 
     fun searchFavouriteTvShowsList(query: String): Flowable<List<TvShow>>
-
 }

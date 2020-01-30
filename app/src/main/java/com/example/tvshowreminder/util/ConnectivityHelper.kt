@@ -21,5 +21,4 @@ object ConnectivityHelper {
             return networkInfo.isConnected
         }
     }
-
 }

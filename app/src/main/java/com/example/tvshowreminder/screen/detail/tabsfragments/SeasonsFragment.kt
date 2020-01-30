@@ -3,7 +3,6 @@ package com.example.tvshowreminder.screen.detail.tabsfragments
 
 import android.content.Context
 import android.os.Bundle
-import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -11,16 +10,13 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.TvShowApplication
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.screen.detail.tabsfragments.adapters.SeasonsRecyclerViewAdapter
+import com.example.tvshowreminder.util.KEY_NUMBER_OF_SEASONS
+import com.example.tvshowreminder.util.KEY_TV_ID
 import javax.inject.Inject
-
-const val KEY_TV_ID = "tv_id"
-const val KEY_NUMBER_OF_SEASONS = "number_of_seasons"
-
 
 class SeasonsFragment : Fragment(), SeasonsContract.View {
 

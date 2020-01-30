@@ -2,8 +2,8 @@ package com.example.tvshowreminder.screen.main
 
 import android.content.Context
 import android.content.Intent
+import android.content.res.Configuration
 import android.os.Bundle
-import android.util.Log
 import android.view.*
 import android.widget.Toast
 import androidx.fragment.app.Fragment
@@ -16,6 +16,8 @@ import kotlinx.android.synthetic.main.fragment_main.*
 import android.view.Gravity
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.widget.SearchView
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tvshowreminder.TvShowApplication
@@ -64,30 +66,26 @@ class MainFragment : Fragment(), MainScreenContract.View,
         bottom_nav_view.setOnNavigationItemSelectedListener(this)
 
         if (savedInstanceState != null) {
-            handleConfigurationChange(savedInstanceState)
+            restoreState(savedInstanceState)
         } else {
             presenter.getTvShowList(menuItemId, page.toString())
         }
     }
 
-    private fun handleConfigurationChange(savedInstanceState: Bundle){
+    private fun restoreState(savedInstanceState: Bundle){
         page = savedInstanceState.getInt(KEY_PAGE)
         query = savedInstanceState.getString(KEY_QUERY)
         menuItemId = savedInstanceState.getInt(KEY_MENU_ITEM_ID)
-
-        when (menuItemId){
-            R.id.menu_item_popular, R.id.menu_item_latest -> {
-                adapter.addItems(presenter.getCachedTvShowList())
-            }
-            R.id.menu_item_shows_to_follow -> {
-                adapter.addItems(presenter.getCachedFavouriteTvShowList())
-            }
-            else -> {}
-        }
+        presenter.getCachedTvShowList()
     }
 
     private fun setRecyclerView() {
-        recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        if (resources.configuration.orientation == Configuration.ORIENTATION_PORTRAIT){
+            recyclerView.layoutManager = LinearLayoutManager(requireContext())
+        } else {
+            recyclerView.layoutManager = GridLayoutManager(requireContext(), 2)
+        }
+
         adapter = TvShowRecyclerAdapter()
         recyclerView.adapter = adapter
         adapter.setOnShowClickListener(this)
@@ -95,22 +93,25 @@ class MainFragment : Fragment(), MainScreenContract.View,
         recyclerView.addOnScrollListener(object : RecyclerView.OnScrollListener() {
             override fun onScrolled(recyclerView: RecyclerView, dx: Int, dy: Int) {
                 super.onScrolled(recyclerView, dx, dy)
-
-                if (menuItemId == R.id.menu_item_shows_to_follow) {
-                    return
-                }
-                if (!recyclerView.canScrollVertically(1)
-                     && ConnectivityHelper.isOnline(requireContext())
-                ) {
-                    if (isNeededToLoad) {
-                        page++
-                        presenter.getTvShowList(menuItemId, page.toString())
-                    }else {
-                        isNeededToLoad = true
-                    }
-                }
+                handlePagination()
             }
         })
+    }
+
+    fun handlePagination(){
+        if (menuItemId == R.id.menu_item_shows_to_follow) {
+            return
+        }
+        if (!recyclerView.canScrollVertically(1)
+            && ConnectivityHelper.isOnline(requireContext())
+        ) {
+            if (isNeededToLoad) {
+                page++
+                presenter.getTvShowList(menuItemId, page.toString())
+            }else {
+                isNeededToLoad = true
+            }
+        }
     }
 
     override fun onCreateOptionsMenu(menu: Menu, inflater: MenuInflater) {
@@ -185,6 +186,7 @@ class MainFragment : Fragment(), MainScreenContract.View,
         if (menuItemId != item.itemId || afterSearch){
             page = 1
             isNeededToLoad = false
+            afterSearch = false
             adapter.resetList()
             menuItemId = item.itemId
             presenter.getTvShowList(menuItemId, page.toString())
@@ -202,8 +204,10 @@ class MainFragment : Fragment(), MainScreenContract.View,
                 showResultMessage(MESSAGE_DETAILS_WITH_NO_INTERNET)
         }
     }
+
+
     private fun startDetailActivity(tvId: Int){
-        val intent = Intent(activity, DetailActivity::class.java)
+        val intent = Intent(requireContext(), DetailActivity::class.java)
         intent.putExtra(INTENT_EXTRA_TV_SHOW_ID, tvId)
         startActivityForResult(intent, REQUEST_CODE_RESULT)
     }
@@ -255,5 +259,4 @@ class MainFragment : Fragment(), MainScreenContract.View,
         super.onDestroy()
         presenter.onDestroy()
     }
-
 }

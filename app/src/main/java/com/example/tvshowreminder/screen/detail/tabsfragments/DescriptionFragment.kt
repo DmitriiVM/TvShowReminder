@@ -8,11 +8,10 @@ import android.view.ViewGroup
 
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.data.pojo.general.TvShowDetails
+import com.example.tvshowreminder.util.KEY_TV_SHOW_DETAIL
 import com.example.tvshowreminder.util.TEXT_NO
 import com.example.tvshowreminder.util.TEXT_YES
 import kotlinx.android.synthetic.main.fragment_description.*
-
-const val KEY_TV_SHOW_DETAIL = "tv_show_detail"
 
 
 class DescriptionFragment : Fragment() {

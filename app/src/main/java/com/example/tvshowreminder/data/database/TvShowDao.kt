@@ -3,6 +3,7 @@ package com.example.tvshowreminder.data.database
 import android.util.Log
 import androidx.room.*
 import com.example.tvshowreminder.data.pojo.episode.Episode
+import com.example.tvshowreminder.data.pojo.episode.NextEpisodeToAir
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
 import com.example.tvshowreminder.data.pojo.general.LatestTvShow
 import com.example.tvshowreminder.data.pojo.general.PopularTvShow
@@ -16,20 +17,20 @@ import io.reactivex.Single
 @Dao
 interface TvShowDao {
 
+    @Query("SELECT * FROM popular_tv_shows_table")
+    fun getPopularTvShowsList(): Single<List<TvShow>>
+
+    @Query("SELECT * FROM latest_tv_shows_table")
+    fun getLatestTvShowsList(): Single<List<TvShow>>
+
+    @Query("SELECT * FROM tv_show_details")
+    fun getFavouriteTvShowsList(): Single<List<TvShowDetails>>
+
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = PopularTvShow::class)
     fun insertPopularTvShowList(tvShowList: List<TvShow>)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE, entity = LatestTvShow::class)
     fun insertLatestTvShowList(tvShowList: List<TvShow>)
-
-    @Query("SELECT * FROM popular_tv_shows_table")
-    fun getPopularTvShowsList(): Flowable<List<TvShow>>
-
-    @Query("SELECT * FROM latest_tv_shows_table")
-    fun getLatestTvShowsList(): Flowable<List<TvShow>>
-
-    @Query("SELECT * FROM tv_show_details")
-    fun getFavouriteTvShowsList(): Flowable<List<TvShowDetails>>
 
 
     @Query("SELECT * FROM tv_show_details WHERE original_name LIKE '%' || :query || '%' OR name LIKE '%' || :query || '%'")
@@ -45,7 +46,6 @@ interface TvShowDao {
     @Delete
     fun deleteTvShow(tvShowDetails: TvShowDetails) : Completable
 
-
     @Query("SELECT * FROM seasons_details WHERE show_id = :tvShowId AND season_number = :seasonNumber")
     fun getFavouriteSeasonDetails(tvShowId: Int, seasonNumber: Int): Flowable<SeasonDetails>
 
@@ -59,13 +59,6 @@ interface TvShowDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun insertEpisodes(episodes: List<Episode>)
 
-
     @Query("DELETE FROM seasons_details WHERE id = :tvShowId")
     fun deleteFavouriteSeasonDetail(tvShowId: Int)
-
-
-
-
-
-
 }

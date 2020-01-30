@@ -1,5 +1,6 @@
 package com.example.tvshowreminder.data.network
 
+import com.example.tvshowreminder.util.API_KEY
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -17,5 +18,4 @@ class ApiKeyInterceptor: Interceptor {
             .build()
         return chain.proceed(request)
     }
-
 }

@@ -9,11 +9,8 @@ import android.view.ViewGroup
 
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.data.pojo.episode.NextEpisodeToAir
+import com.example.tvshowreminder.util.KEY_NEXT_EPISODE
 import kotlinx.android.synthetic.main.fragment_new_episode.*
-
-
-const val KEY_NEXT_EPISODE = "next_episode"
-
 
 class NewEpisodeFragment : Fragment() {
 
@@ -51,6 +48,4 @@ class NewEpisodeFragment : Fragment() {
             }
         }
     }
-
-
 }

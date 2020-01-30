@@ -24,6 +24,5 @@ class DetailActivity : AppCompatActivity() {
         image_view_navigate_back.setOnClickListener {
             onBackPressed()
         }
-
     }
 }

@@ -1,10 +1,11 @@
 package com.example.tvshowreminder.screen.detail.tabsfragments
 
-import android.util.Log
+import android.content.res.Resources
+import com.example.tvshowreminder.R
 import com.example.tvshowreminder.data.TvShowRepository
 import com.example.tvshowreminder.data.pojo.season.SeasonDetails
-import com.example.tvshowreminder.util.ERROR_MESSAGE
 import com.example.tvshowreminder.util.Resource
+import com.example.tvshowreminder.util.getDeviceLanguage
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
@@ -25,7 +26,7 @@ class SeasonPresenter @Inject constructor(
 
     override fun getSeasonsDetails(tvId: Int, seasonNumber: Int, numberOfSeasons: Int){
         disposable.add(
-            repository.getSeasonDetails(tvId, seasonNumber)
+            repository.getSeasonDetails(tvId, seasonNumber, getDeviceLanguage())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe({resource ->
@@ -40,7 +41,7 @@ class SeasonPresenter @Inject constructor(
                         }
                     }
                 }, { t ->
-                    view.showError(t.message ?: ERROR_MESSAGE)
+                    view.showError(t.message ?: Resources.getSystem().getString(R.string.error_message))
                 })
         )
     }
@@ -52,7 +53,4 @@ class SeasonPresenter @Inject constructor(
     override fun onDestroy() {
         disposable.dispose()
     }
-
-
-
 }

@@ -1,10 +1,7 @@
 package com.example.tvshowreminder.util
 
-import android.content.Context
+import android.os.Build
 import android.widget.ImageView
-import androidx.recyclerview.widget.GridLayoutManager
-import androidx.recyclerview.widget.LinearLayoutManager
-import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.bumptech.glide.request.RequestOptions
 import com.example.tvshowreminder.R
@@ -16,29 +13,44 @@ enum class ErrorImageOrientation{
     HORIZONTAL, VERTICAL
 }
 
-fun ImageView.setImage(posterPath: String, orientation: ErrorImageOrientation){
+internal fun ImageView.setImage(posterPath: String, orientation: ErrorImageOrientation){
+
 
     val requestOptions = RequestOptions()
     when (orientation){
         HORIZONTAL -> {
-            requestOptions.error(R.drawable.no_image_available_horizontal)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                requestOptions.error(R.drawable.no_image_available_horizontal)
+            } else {
+                requestOptions.error(R.drawable.ic_sentiment_dissatisfied)
+            }
         }
         VERTICAL -> {
-            requestOptions.error(R.drawable.no_image_available_vertical)
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N){
+                requestOptions.error(R.drawable.no_image_available_vertical)
+            } else {
+                requestOptions.error(R.drawable.ic_sentiment_dissatisfied)
+            }
         }
     }
-    Glide
-        .with(context)
-        .setDefaultRequestOptions(requestOptions)
-        .load(BASE_IMAGE_URL + posterPath)
-        .into(this)
+
+        Glide
+            .with(context)
+            .setDefaultRequestOptions(requestOptions)
+            .load(BASE_IMAGE_URL + posterPath)
+            .into(this)
 }
 
-fun getCurrentDate(): String {
+internal fun getDeviceLanguage(): String {
+    return Locale.getDefault().toLanguageTag()
+}
+
+internal fun getCurrentDate(): String {
     val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
     return simpleDateFormat.format(Date())
 }
 
-fun getDeviceLanguage(): String {
-    return Locale.getDefault().toLanguageTag()
+internal fun String.convertStringToDate(): Date? {
+    val simpleDateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    return simpleDateFormat.parse(this)
 }

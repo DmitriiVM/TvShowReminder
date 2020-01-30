@@ -6,12 +6,9 @@ import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.tvshowreminder.R
 import com.example.tvshowreminder.data.pojo.general.TvShow
-import com.example.tvshowreminder.util.BASE_IMAGE_URL
 import com.example.tvshowreminder.util.ErrorImageOrientation
-import com.example.tvshowreminder.util.SharedPreferenceHelper
 import com.example.tvshowreminder.util.setImage
-import kotlinx.android.synthetic.main.tvshow_item_compact_type.view.*
-import kotlinx.android.synthetic.main.tvshow_item_poster_type.view.*
+import kotlinx.android.synthetic.main.tvshow_item.view.*
 
 class TvShowRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
 
@@ -33,7 +30,7 @@ class TvShowRecyclerAdapter : RecyclerView.Adapter<RecyclerView.ViewHolder>(){
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder =
-        TvShowViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tvshow_item_compact_type, parent, false))
+        TvShowViewHolder(LayoutInflater.from(parent.context).inflate(R.layout.tvshow_item, parent, false))
 
     override fun getItemCount(): Int = tvShowList.size
 
